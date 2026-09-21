@@ -1,0 +1,21 @@
+# Purpose: Verify the gateway; licensed Unity editor tests are documented and run separately.
+name: Verify gateway
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: gateway/package-lock.json
+      - run: npm ci
+      - run: npm test

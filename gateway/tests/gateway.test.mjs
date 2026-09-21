@@ -1,0 +1,13 @@
+// Purpose: Test authenticated HTTP delivery, bounded inference and explicit failure responses with synthetic judgments.
+import test from 'node:test';import assert from 'node:assert/strict';import {once} from 'node:events';import {readFile} from 'node:fs/promises';
+import {createGateway} from '../src/server.mjs';
+const read=async path=>JSON.parse(await readFile(new URL(path,import.meta.url)));
+const pack=await read('../../packs/support-triage.json'),fixture=await read('../../examples/synthetic-billing-response.json');
+const token='synthetic-gateway-session';const payload={packId:pack.name,state:{text:'Charged twice'},revision:'42',requestId:'one'};
+async function host(t,options={}){const server=createGateway({packs:{[pack.name]:pack},token,provider:async()=>structuredClone(fixture),...options});server.listen(0,'127.0.0.1');await once(server,'listening');t.after(()=>new Promise(resolve=>{server.close(resolve);server.closeAllConnections();}));return `http://127.0.0.1:${server.address().port}/v1/decision`;}
+const post=(url,body=payload,key=token)=>fetch(url,{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(3000)});
+test('real HTTP returns guarded request identity and a DecisionPacks record',async t=>{const response=await post(await host(t));assert.equal(response.status,200);const result=await response.json();assert.equal(result.record.outcome,'billing');assert.equal(result.revision,'42');assert.equal(result.requestId,'one');assert.ok(result.record.pack.fingerprint);});
+test('missing auth and unregistered packs never invoke inference',async t=>{let calls=0;const url=await host(t,{provider:()=>{calls++;throw Error('unexpected');}});assert.equal((await post(url,payload,'wrong')).status,401);assert.equal((await post(url,{...payload,packId:'unknown'})).status,400);assert.equal(calls,0);});
+test('provider errors are reported without exposing credentials to the game',async t=>{const errors=[];const url=await host(t,{provider:()=>{throw Error('secret diagnostic');},onError:e=>errors.push(e)});const res=await post(url);assert.equal(res.status,502);assert.doesNotMatch(await res.text(),/secret/);assert.equal(errors.length,1);});
+test('inference deadline aborts the provider',async t=>{let signal;const url=await host(t,{timeoutMs:30,provider:options=>{signal=options.signal;return new Promise(()=>{});},onError:()=>{}});const res=await post(url);assert.equal(res.status,504);assert.equal(signal.aborted,true);});
+test('malformed input returns 400',async t=>{const url=await host(t);assert.equal((await post(url,null)).status,400);assert.equal((await post(url,{...payload,state:[]})).status,400);});

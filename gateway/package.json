@@ -1,0 +1,14 @@
+{
+  "name": "@gbesse/unity-jev-gateway",
+  "description": "Server-only DecisionPacks gateway for the Unity addon.",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "start": "node src/server.mjs"
+  },
+  "dependencies": {
+    "@gbesse/decisionpacks": "git+https://github.com/gbesse/decisionpacks.git#3c90b6e667c16653b9a6ae00b376df9bddbd8461"
+  }
+}

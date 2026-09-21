@@ -1,0 +1,13 @@
+{
+  "name": "JevBehavior.Runtime",
+  "rootNamespace": "JevBehavior",
+  "references": [
+    "Unity.Behavior",
+    "Unity.Properties"
+  ],
+  "autoReferenced": true,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "Newtonsoft.Json.dll"
+  ]
+}
