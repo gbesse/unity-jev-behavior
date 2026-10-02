@@ -1,6 +1,6 @@
 {
   "name": "io.gbesse.jev-behavior",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Jev Behavior",
   "description": "Guarded asynchronous decision nodes for Unity Behavior, using a server-side DecisionPacks gateway.",
   "unity": "6000.0",
