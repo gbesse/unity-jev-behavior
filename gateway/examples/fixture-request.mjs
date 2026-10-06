@@ -26,7 +26,13 @@ try {
   if (!response.ok || body.requestId !== 'synthetic-request-1' || body.record?.outcome !== 'billing') {
     throw new Error(`Unexpected synthetic gateway response: ${response.status}`);
   }
-  console.log(JSON.stringify({source: 'synthetic fixture; no Jev call', status: response.status, outcome: body.record.outcome, revision: body.revision}));
+  const rejected = await fetch(`http://127.0.0.1:${server.address().port}/v1/decision`, {
+    method: 'POST',
+    headers: {'authorization': 'Bearer invalid-token', 'content-type': 'application/json'},
+    body: JSON.stringify({packId: pack.name, state: {text: state.text}, revision: 'demo-2', requestId: 'synthetic-request-2'}),
+  });
+  if (rejected.status !== 401) throw new Error(`Expected an unauthorized response; got ${rejected.status}`);
+  console.log(JSON.stringify({source: 'synthetic fixture; no Jev call', status: response.status, outcome: body.record.outcome, revision: body.revision, unauthorized_status: rejected.status}));
 } finally {
   await new Promise(resolve => server.close(resolve));
 }
