@@ -2,14 +2,14 @@
 
 A native Unity Behavior action node with finite outcomes, revision checks and an authenticated Node.js gateway. Jev credentials stay on the server; the game receives a decision record and chooses its own next action.
 
-**v0.1.1 experimental alpha · MIT · Unity 6**. Tested in editor 6000.3.23f1 with Unity Behavior 1.0.16. Independent community integration.
+**v0.1.2 experimental alpha · MIT · Unity 6**. Tested in editor 6000.3.23f1 with Unity Behavior 1.0.16. Independent community integration.
 
 ## Install
 
 In Unity Package Manager → Add package from Git URL:
 
 ```text
-https://github.com/gbesse/unity-jev-behavior.git#v0.1.1
+https://github.com/gbesse/unity-jev-behavior.git#v0.1.2
 ```
 
 Create a **Jev / Behavior Policy** asset. Add `JevDecisionClient` to a GameObject. In a Behavior graph add **Action / Jev / Jev Decision**, then bind `ClientObject`, `Policy`, `StateJson`, `Revision`, `Outcome` and `Error` blackboard variables. A valid result sets `Outcome` and succeeds; failure clears the outcome and reports the error. Changing `Revision` while evaluating rejects the response. Increment this revision whenever relevant world state changes.
@@ -34,6 +34,8 @@ The supplied gateway is a loopback development server with a shared development 
 ## Verify the gateway contract before opening Unity
 
 `cd gateway && npm ci && npm run demo:fixture` starts an ephemeral loopback gateway, sends the bundled synthetic support ticket and prints the finite outcome. It needs no API key or Unity editor. The example confirms the HTTP contract only; use the Unity sample above to verify the Behavior node and revision handling in Editor.
+
+The same fixture now sends a second request with an invalid token and requires HTTP 401. / La même fixture envoie une seconde requête avec un jeton invalide et exige HTTP 401. / La misma fixture envía una segunda solicitud con un token no válido y exige HTTP 401. This exercises the gateway's authentication boundary; it does not validate a Unity player build. / Elle vérifie la frontière d'authentification de la passerelle, pas une compilation du jeu Unity. / Comprueba el límite de autenticación de la pasarela, no una compilación del juego Unity.
 
 ## Verification
 
