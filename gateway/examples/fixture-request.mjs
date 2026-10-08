@@ -32,7 +32,13 @@ try {
     body: JSON.stringify({packId: pack.name, state: {text: state.text}, revision: 'demo-2', requestId: 'synthetic-request-2'}),
   });
   if (rejected.status !== 401) throw new Error(`Expected an unauthorized response; got ${rejected.status}`);
-  console.log(JSON.stringify({source: 'synthetic fixture; no Jev call', status: response.status, outcome: body.record.outcome, revision: body.revision, unauthorized_status: rejected.status}));
+  const unknownPack = await fetch(`http://127.0.0.1:${server.address().port}/v1/decision`, {
+    method: 'POST',
+    headers: {'authorization': `Bearer ${token}`, 'content-type': 'application/json'},
+    body: JSON.stringify({packId: 'unregistered-pack', state: {text: state.text}, revision: 'demo-3', requestId: 'synthetic-request-3'}),
+  });
+  if (unknownPack.status !== 400) throw new Error(`Expected an unknown-pack response; got ${unknownPack.status}`);
+  console.log(JSON.stringify({source: 'synthetic fixture; no Jev call', status: response.status, outcome: body.record.outcome, revision: body.revision, unauthorized_status: rejected.status, unknown_pack_status: unknownPack.status}));
 } finally {
   await new Promise(resolve => server.close(resolve));
 }
