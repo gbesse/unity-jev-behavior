@@ -2,14 +2,14 @@
 
 A native Unity Behavior action node with finite outcomes, revision checks and an authenticated Node.js gateway. Jev credentials stay on the server; the game receives a decision record and chooses its own next action.
 
-**v0.1.2 experimental alpha · MIT · Unity 6**. Tested in editor 6000.3.23f1 with Unity Behavior 1.0.16. Independent community integration.
+**v0.1.3 experimental alpha · MIT · Unity 6**. Tested in editor 6000.3.23f1 with Unity Behavior 1.0.16. Independent community integration.
 
 ## Install
 
 In Unity Package Manager → Add package from Git URL:
 
 ```text
-https://github.com/gbesse/unity-jev-behavior.git#v0.1.2
+https://github.com/gbesse/unity-jev-behavior.git#v0.1.3
 ```
 
 Create a **Jev / Behavior Policy** asset. Add `JevDecisionClient` to a GameObject. In a Behavior graph add **Action / Jev / Jev Decision**, then bind `ClientObject`, `Policy`, `StateJson`, `Revision`, `Outcome` and `Error` blackboard variables. A valid result sets `Outcome` and succeeds; failure clears the outcome and reports the error. Changing `Revision` while evaluating rejects the response. Increment this revision whenever relevant world state changes.
@@ -50,3 +50,11 @@ Open `TestProject~` in the specified Unity editor and run EditMode tests in Test
 See [reuse and provenance](docs/reuse.md), [contributing](CONTRIBUTING.md) and [security](SECURITY.md).
 
 [Recorded verification scope](docs/verification.md).
+
+## October 2026 improvement · Amélioration d’octobre 2026 · Mejora de octubre de 2026
+
+`cd gateway && npm run demo:fixture` now checks both an invalid token (401) and an unregistered pack (400) alongside the successful synthetic decision. It does not validate a Unity player build.
+
+`cd gateway && npm run demo:fixture` vérifie désormais un jeton invalide (401), un pack non enregistré (400) et la décision synthétique valide. Cela ne valide pas une compilation Unity.
+
+`cd gateway && npm run demo:fixture` ahora comprueba un token inválido (401), un pack no registrado (400) y la decisión sintética válida. Esto no valida una compilación de Unity.
