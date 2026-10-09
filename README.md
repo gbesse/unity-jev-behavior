@@ -58,3 +58,7 @@ See [reuse and provenance](docs/reuse.md), [contributing](CONTRIBUTING.md) and [
 `cd gateway && npm run demo:fixture` vérifie désormais un jeton invalide (401), un pack non enregistré (400) et la décision synthétique valide. Cela ne valide pas une compilation Unity.
 
 `cd gateway && npm run demo:fixture` ahora comprueba un token inválido (401), un pack no registrado (400) y la decisión sintética válida. Esto no valida una compilación de Unity.
+
+## Contrôle d’adoption · Adoption check · Comprobación de adopción
+
+[Français : essayer un cas concret](examples/adoption-check.md) · [English: try a concrete case](examples/adoption-check.md) · [Español: pruebe un caso concreto](examples/adoption-check.md).
