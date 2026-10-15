@@ -156,9 +156,8 @@ export function createGateway({
       const record = await evaluate(registry[packId], state, {
         provider: (options) => {
           providerPending = true;
-          const underlying = provider ?? createJevProvider();
           return Promise.resolve()
-            .then(() => underlying(options))
+            .then(() => (provider ?? createJevProvider())(options))
             .finally(() => {
               providerPending = false;
               if (requestFinished && ownedId !== null) {
