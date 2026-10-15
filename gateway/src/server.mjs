@@ -42,7 +42,8 @@ export function createGateway({
       'FR : limites de cache invalides. EN: invalid cache bounds. ES: límites de caché no válidos.',
     );
   const pending = new Map(),
-    completed = new Map();
+    completed = new Map(),
+    overruns = new Set();
   const registry = structuredClone(packs);
   Object.values(registry).forEach(validatePack);
   let active = 0;
@@ -63,12 +64,17 @@ export function createGateway({
       respond(401, { error: 'Unauthorized' });
       return;
     }
-    if (active >= maxConcurrent) {
-      respond(429, { error: 'Gateway busy' });
+    if (active + overruns.size >= maxConcurrent) {
+      respond(429, {
+        error: 'FR : passerelle occupée, y compris les appels non terminés. EN: gateway busy, including unfinished calls. ES: pasarela ocupada, incluidas llamadas sin terminar.',
+        code: 'gateway_busy',
+      });
       return;
     }
     active++;
-    let ownedId = null;
+    let ownedId = null,
+      providerPending = false,
+      requestFinished = false;
     const controller = new AbortController();
     const timer = setTimeout(() => {
       controller.abort(new Error('Gateway deadline'));
@@ -148,7 +154,18 @@ export function createGateway({
       pending.set(requestId, { fingerprint });
       ownedId = requestId;
       const record = await evaluate(registry[packId], state, {
-        provider: provider ?? createJevProvider(),
+        provider: (options) => {
+          providerPending = true;
+          return Promise.resolve()
+            .then(() => (provider ?? createJevProvider())(options))
+            .finally(() => {
+              providerPending = false;
+              if (requestFinished && ownedId !== null) {
+                pending.delete(ownedId);
+                overruns.delete(ownedId);
+              }
+            });
+        },
         timeoutMs,
         signal: controller.signal,
       });
@@ -164,7 +181,11 @@ export function createGateway({
       onError(error);
       respond(controller.signal.aborted ? 504 : 502, { error: 'Decision failed' });
     } finally {
-      if (ownedId !== null) pending.delete(ownedId);
+      requestFinished = true;
+      if (ownedId !== null) {
+        if (providerPending) overruns.add(ownedId);
+        else pending.delete(ownedId);
+      }
       clearTimeout(timer);
       active--;
       res.off('close', abort);
