@@ -1,7 +1,7 @@
 {
   "name": "@gbesse/unity-jev-gateway",
   "description": "Server-only DecisionPacks gateway for the Unity addon.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "private": true,
   "scripts": {

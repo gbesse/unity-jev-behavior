@@ -11,3 +11,43 @@ test('missing auth and unregistered packs never invoke inference',async t=>{let 
 test('provider errors are reported without exposing credentials to the game',async t=>{const errors=[];const url=await host(t,{provider:()=>{throw Error('secret diagnostic');},onError:e=>errors.push(e)});const res=await post(url);assert.equal(res.status,502);assert.doesNotMatch(await res.text(),/secret/);assert.equal(errors.length,1);});
 test('inference deadline aborts the provider',async t=>{let signal;const url=await host(t,{timeoutMs:30,provider:options=>{signal=options.signal;return new Promise(()=>{});},onError:()=>{}});const res=await post(url);assert.equal(res.status,504);assert.equal(signal.aborted,true);});
 test('malformed input returns 400',async t=>{const url=await host(t);assert.equal((await post(url,null)).status,400);assert.equal((await post(url,{...payload,state:[]})).status,400);});
+
+
+test('an ignored abort retains capacity until the underlying provider settles', async t=>{
+ let finish, calls=0;
+ const gate=new Promise(resolve=>{finish=resolve;});
+ const url=await host(t,{timeoutMs:30,maxConcurrent:1,cacheLimit:0,onError:()=>{},provider:async()=>{
+  calls++;if(calls===1)await gate;return structuredClone(fixture);
+ }});
+ assert.equal((await post(url)).status,504);
+ assert.equal((await post(url,{...payload,requestId:'two'})).status,429);
+ assert.equal(calls,1);
+ finish();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal((await post(url,{...payload,requestId:'two'})).status,200);
+ assert.equal(calls,2);
+});
+test('timed-out identity stays reserved while capacity remains for other requests', async t=>{
+ let finish,calls=0;
+ const gate=new Promise(resolve=>{finish=resolve;});
+ const url=await host(t,{timeoutMs:30,maxConcurrent:2,onError:()=>{},provider:async()=>{
+  calls++;if(calls===1)await gate;return structuredClone(fixture);
+ }});
+ try{
+  assert.equal((await post(url)).status,504);
+  assert.equal((await post(url)).status,425);
+  assert.equal((await post(url,{...payload,revision:'changed'})).status,409);
+  assert.equal((await post(url,{...payload,requestId:'other'})).status,200);
+  assert.equal(calls,2);
+ }finally{finish();}
+});
+test('late rejection releases capacity without unhandled rejection or cached result', async t=>{
+ let reject,calls=0;
+ const gate=new Promise((resolve,fail)=>{reject=fail;});
+ const url=await host(t,{timeoutMs:30,maxConcurrent:1,onError:()=>{},provider:async()=>{
+  calls++;if(calls===1)await gate;return structuredClone(fixture);
+ }});
+ assert.equal((await post(url)).status,504);
+ reject(new Error('synthetic late error'));await new Promise(resolve=>setImmediate(resolve));
+ const response=await post(url);assert.equal(response.status,200);assert.equal((await response.json()).cache,'fresh');
+ assert.equal(calls,2);
+});
