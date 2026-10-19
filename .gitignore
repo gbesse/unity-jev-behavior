@@ -42,3 +42,11 @@ TestProject~/ProjectSettings/*
 !TestProject~/ProjectSettings/ProjectVersion.txt
 **/node_modules.meta
 src.meta
+
+PortableGuardTests~/bin/
+PortableGuardTests~/obj/
+
+!PortableGuardTests~/
+PortableGuardTests~/*
+!PortableGuardTests~/GuardTests.csproj
+!PortableGuardTests~/Program.cs

@@ -16,6 +16,17 @@ namespace JevBehaviorTests
 {
     public sealed class JevHttpClientTests
     {
+        [Test] public void PreCancelledRequestsDoNotStartTransport()
+        {
+            var go=new GameObject("Jev cancellation test");
+            try
+            {
+                var client=go.AddComponent<JevDecisionClient>();
+                using var cancellation=new CancellationTokenSource();cancellation.Cancel();
+                Assert.ThrowsAsync<OperationCanceledException>(async()=>await client.EvaluateAsync("support/triage","{}","v1","r1",cancellation.Token));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(go); }
+        }
         [UnityTest] public IEnumerator SendsAuthenticatedRequestAndReceivesDecision()
         {
             var portFinder=new TcpListener(IPAddress.Loopback,0); portFinder.Start(); int port=((IPEndPoint)portFinder.LocalEndpoint).Port; portFinder.Stop();
