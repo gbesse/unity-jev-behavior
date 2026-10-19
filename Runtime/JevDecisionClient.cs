@@ -16,6 +16,7 @@ namespace JevBehavior
         [NonSerialized] public string SessionToken;
         public async Task<JObject> EvaluateAsync(string packId, string stateJson, string revision, string requestId, CancellationToken cancellation)
         {
+            cancellation.ThrowIfCancellationRequested();
             if (!Uri.TryCreate(GatewayUrl, UriKind.Absolute, out var uri) || (uri.Scheme != "https" && !(uri.Scheme == "http" && uri.IsLoopback)))
                 throw new InvalidOperationException("Gateway requires HTTPS, except on loopback.");
             if (string.IsNullOrWhiteSpace(SessionToken)) throw new InvalidOperationException("Set a gateway session token at runtime.");
@@ -30,6 +31,7 @@ namespace JevBehavior
             request.timeout = TimeoutSeconds; request.redirectLimit = 0;
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
             deadline.CancelAfter(TimeSpan.FromSeconds(TimeoutSeconds));
+            deadline.Token.ThrowIfCancellationRequested();
             var operation = request.SendWebRequest();
             try
             {

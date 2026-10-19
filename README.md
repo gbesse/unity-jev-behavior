@@ -16,7 +16,7 @@ Las respuestas correctas conservan por defecto hasta 128 entradas durante 60 seg
 
 A native Unity Behavior action node with finite outcomes, revision checks and an authenticated Node.js gateway. Jev credentials stay on the server; the game receives a decision record and chooses its own next action.
 
-**v0.1.4 · FR : alpha expérimentale · EN: experimental alpha · ES: alfa experimental · MIT · Unity 6**. Tested in editor 6000.3.23f1 with Unity Behavior 1.0.16. Independent community integration.
+**v0.1.6 · FR : évolution source expérimentale · EN: experimental source update · ES: actualización fuente experimental · MIT · Unity 6**. FR : la validation Editor 6000.3.23f1 / Behavior 1.0.16 concernait la version 0.1.4 ; cette évolution attend une nouvelle validation Editor, bloquée ici par la licence. EN: Editor 6000.3.23f1 / Behavior 1.0.16 validation applied to 0.1.4; this update awaits a new Editor run, blocked here by licensing. ES: la validación Editor 6000.3.23f1 / Behavior 1.0.16 correspondía a 0.1.4; esta actualización espera nueva validación Editor, bloqueada aquí por licencia.
 
 ## Install
 
@@ -76,3 +76,17 @@ See [reuse and provenance](docs/reuse.md), [contributing](CONTRIBUTING.md) and [
 ## Contrôle d’adoption · Adoption check · Comprobación de adopción
 
 [Français : essayer un cas concret](examples/adoption-check.md) · [English: try a concrete case](examples/adoption-check.md) · [Español: pruebe un caso concreto](examples/adoption-check.md).
+
+## Identités typées et annulation / Typed identities and cancellation / Identidades tipadas y cancelación
+
+FR — Le garde refuse les identités vides, blanches ou converties depuis des nombres, ainsi que les versions de schéma fractionnaires. Une valeur numérique exactement égale à 1 reste compatible. Le modèle doit être un texte non vide ; son identité reste déclarée par la passerelle. Une requête déjà annulée échoue avant le transport UnityWebRequest. Les décisions restent limitées aux issues de la politique, sans nouvelle logique autonome.
+
+EN — The guard rejects empty, whitespace or number-coerced identities and fractional schema versions. A numeric value exactly equal to 1 remains compatible. Model identity must be nonempty text and remains gateway-declared. Already-cancelled requests fail before UnityWebRequest transport. Decisions remain restricted to policy outcomes, without new autonomous behavior.
+
+ES — El guard rechaza identidades vacías, blancas o convertidas desde números, y versiones fraccionarias. Un valor numérico exactamente igual a 1 sigue siendo compatible. El modelo debe ser texto no vacío y su identidad sigue declarada por la pasarela. Peticiones ya canceladas fallan antes del transporte UnityWebRequest. Decisiones siguen limitadas a resultados de la política, sin nueva autonomía.
+
+FR — Le garde de production peut être compilé et testé séparément avec `dotnet run --project PortableGuardTests~/GuardTests.csproj`. La CI utilise ce contrôle en plus de la passerelle ; cela ne valide ni `UnityWebRequest` ni Behavior dans Editor. Aucun nouveau tag natif avant cette validation.
+
+EN — Compile and test the production guard independently with `dotnet run --project PortableGuardTests~/GuardTests.csproj`. CI runs this alongside gateway checks; it validates neither `UnityWebRequest` nor Behavior in Editor. No new native tag before that validation.
+
+ES — Compila y prueba el guard de producción por separado con `dotnet run --project PortableGuardTests~/GuardTests.csproj`. CI lo ejecuta junto a la pasarela; no valida `UnityWebRequest` ni Behavior en Editor. Sin nuevo tag nativo hasta esa validación.

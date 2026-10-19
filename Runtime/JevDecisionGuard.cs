@@ -1,21 +1,31 @@
-// Purpose: Reject stale, misrouted or unknown decisions before changing a Behavior blackboard.
+// Purpose: Reject empty, coerced, stale or misrouted decisions before changing a Behavior blackboard.
 using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace JevBehavior
 {
     public static class JevDecisionGuard
     {
+        private static bool Text(JToken value) => value != null && value.Type == JTokenType.String && !string.IsNullOrWhiteSpace((string)value);
+        private static bool Exact(JToken value, string expected) => Text(value) && string.Equals((string)value, expected, StringComparison.Ordinal);
+        private static bool SchemaOne(JToken value) => value != null &&
+            ((value.Type == JTokenType.Integer && value.ToString(Formatting.None) == "1") ||
+             (value.Type == JTokenType.Float && (double)value == 1.0));
         public static string Accept(JObject response, string requestId, string capturedRevision, string currentRevision, string packId, string[] allowedOutcomes)
         {
-            if (capturedRevision != currentRevision) throw new InvalidOperationException("World revision changed during evaluation.");
-            if ((string)response["requestId"] != requestId || (string)response["revision"] != capturedRevision) throw new InvalidOperationException("Decision request mismatch.");
+            if (response == null || string.IsNullOrWhiteSpace(requestId) || string.IsNullOrWhiteSpace(capturedRevision) || string.IsNullOrWhiteSpace(currentRevision) || string.IsNullOrWhiteSpace(packId))
+                throw new InvalidOperationException("Identite de decision vide / Empty decision identity / Identidad de decision vacia");
+            if (capturedRevision != currentRevision) throw new InvalidOperationException("Revision du monde modifiee / World revision changed / Revision del mundo modificada");
+            if (!Exact(response["requestId"], requestId) || !Exact(response["revision"], capturedRevision))
+                throw new InvalidOperationException("Requete de decision differente / Decision request mismatch / Solicitud de decision distinta");
             var record = response["record"] as JObject;
-            if (record == null || (int?)record["schemaVersion"] != 1 || (string)record["pack"]?["name"] != packId || string.IsNullOrEmpty((string)record["model"]))
-                throw new InvalidOperationException("Invalid decision provenance.");
-            var outcome = (string)record["outcome"];
-            if (string.IsNullOrEmpty(outcome) || allowedOutcomes == null || Array.IndexOf(allowedOutcomes, outcome) < 0)
-                throw new InvalidOperationException("Decision outcome is not allowed by this policy.");
-            return outcome;
+            var pack = record?["pack"] as JObject;
+            if (record == null || !SchemaOne(record["schemaVersion"]) || !Exact(pack?["name"], packId) || !Text(record["model"]))
+                throw new InvalidOperationException("Provenance de decision invalide / Invalid decision provenance / Procedencia de decision no valida");
+            var value = record["outcome"];
+            if (!Text(value) || allowedOutcomes == null || Array.IndexOf(allowedOutcomes, (string)value) < 0)
+                throw new InvalidOperationException("Issue de decision non autorisee / Decision outcome not allowed / Resultado de decision no permitido");
+            return (string)value;
         }
     }
 }
