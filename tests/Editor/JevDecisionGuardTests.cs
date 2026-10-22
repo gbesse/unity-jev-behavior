@@ -42,6 +42,11 @@ namespace JevBehaviorTests
             var response=Response();response["record"]["model"]=123;
             Assert.Throws<InvalidOperationException>(()=>JevDecisionGuard.Accept(response,"r1","v1","v1","support/triage",new[]{"billing"}));
         }
+        [Test] public void RejectsDuplicateOrBlankPolicyOutcomes()
+        {
+            foreach(var allowed in new[]{new[]{"billing","billing"},new[]{"billing"," "}})
+                Assert.Throws<InvalidOperationException>(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v1","support/triage",allowed));
+        }
         [Test] public void ExposesNativeActionAndPolicy()
         {
             var policy=ScriptableObject.CreateInstance<JevBehaviorPolicy>();
