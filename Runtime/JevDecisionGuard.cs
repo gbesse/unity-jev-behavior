@@ -1,5 +1,6 @@
 // Purpose: Reject empty, coerced, stale or misrouted decisions before changing a Behavior blackboard.
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace JevBehavior
@@ -15,6 +16,12 @@ namespace JevBehavior
         {
             if (response == null || string.IsNullOrWhiteSpace(requestId) || string.IsNullOrWhiteSpace(capturedRevision) || string.IsNullOrWhiteSpace(currentRevision) || string.IsNullOrWhiteSpace(packId))
                 throw new InvalidOperationException("Identite de decision vide / Empty decision identity / Identidad de decision vacia");
+            if (allowedOutcomes == null || allowedOutcomes.Length == 0)
+                throw new InvalidOperationException("Politique vide / Empty policy / Politica vacia");
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var outcome in allowedOutcomes)
+                if (string.IsNullOrWhiteSpace(outcome) || !seen.Add(outcome))
+                    throw new InvalidOperationException("Issues de politique vides ou dupliquees / Empty or duplicate policy outcomes / Resultados de politica vacios o duplicados");
             if (capturedRevision != currentRevision) throw new InvalidOperationException("Revision du monde modifiee / World revision changed / Revision del mundo modificada");
             if (!Exact(response["requestId"], requestId) || !Exact(response["revision"], capturedRevision))
                 throw new InvalidOperationException("Requete de decision differente / Decision request mismatch / Solicitud de decision distinta");

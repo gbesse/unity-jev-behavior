@@ -90,3 +90,11 @@ FR — Le garde de production peut être compilé et testé séparément avec `d
 EN — Compile and test the production guard independently with `dotnet run --project PortableGuardTests~/GuardTests.csproj`. CI runs this alongside gateway checks; it validates neither `UnityWebRequest` nor Behavior in Editor. No new native tag before that validation.
 
 ES — Compila y prueba el guard de producción por separado con `dotnet run --project PortableGuardTests~/GuardTests.csproj`. CI lo ejecuta junto a la pasarela; no valida `UnityWebRequest` ni Behavior en Editor. Sin nuevo tag nativo hasta esa validación.
+
+## Politique / Policy / Política
+
+FR — Le garde refuse les politiques vides, les issues blanches et les doublons avant tout verdict. Cette évolution est publiée en source ; les tests Editor et player build restent non validés (licence indisponible lors du précédent essai, code 198).
+
+EN — The guard rejects empty policies, blank outcomes and duplicates before accepting any verdict. This change is source-only; Editor tests and player build remain unvalidated (previous attempt lacked a valid license, exit 198).
+
+ES — El guard rechaza políticas vacías, resultados en blanco y duplicados antes de aceptar un veredicto. Cambio publicado solo en fuente; pruebas Editor y player build sin validar (intento previo sin licencia válida, código 198).

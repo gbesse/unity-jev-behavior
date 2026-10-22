@@ -20,6 +20,8 @@ class Program
   {var r=Response();r["record"]["outcome"]="unknown";Reject(()=>Accept(r));}
   Reject(()=>Accept(null));
   Reject(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v2","support/triage",new[]{"billing"}));
+  foreach(var allowed in new string[][]{new string[0],new[]{"billing","billing"},new[]{"billing"," "},new[]{"billing",null}})
+   Reject(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v1","support/triage",allowed));
   Console.WriteLine("{\"passed\":true,\"productionGuardCompiled\":true,\"checks\":"+checks+",\"unityEditorValidated\":false,\"liveCalls\":0}");
  }
 }
