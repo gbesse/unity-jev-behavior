@@ -21,7 +21,7 @@ namespace JevBehavior
                 throw new InvalidOperationException("Gateway requires HTTPS, except on loopback.");
             if (string.IsNullOrWhiteSpace(SessionToken)) throw new InvalidOperationException("Set a gateway session token at runtime.");
             if (TimeoutSeconds < 1 || TimeoutSeconds > 60) throw new InvalidOperationException("Invalid timeout.");
-            var state = JObject.Parse(stateJson);
+            var state = JevDecisionGuard.Parse(stateJson);
             var payload = new JObject { ["packId"] = packId, ["state"] = state, ["revision"] = revision, ["requestId"] = requestId };
             var bytes = Encoding.UTF8.GetBytes(payload.ToString(Newtonsoft.Json.Formatting.None));
             if (bytes.Length > 100000) throw new InvalidOperationException("Decision request is too large.");
@@ -40,7 +40,7 @@ namespace JevBehavior
                 deadline.Token.ThrowIfCancellationRequested();
                 if (request.result != UnityWebRequest.Result.Success) throw new InvalidOperationException($"Gateway request failed ({request.responseCode}): {request.error}");
                 if (request.downloadHandler.data.Length > 1000000) throw new InvalidOperationException("Gateway response too large.");
-                return JObject.Parse(request.downloadHandler.text);
+                return JevDecisionGuard.Parse(request.downloadHandler.text);
             }
             catch { request.Abort(); throw; }
         }
