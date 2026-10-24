@@ -22,6 +22,9 @@ class Program
   Reject(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v2","support/triage",new[]{"billing"}));
   foreach(var allowed in new string[][]{new string[0],new[]{"billing","billing"},new[]{"billing"," "},new[]{"billing",null}})
    Reject(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v1","support/triage",allowed));
+  foreach(var raw in new[]{"{\"requestId\":\"a\",\"requestId\":\"b\"}","{\"record\":{\"outcome\":\"a\",\"outcome\":\"b\"}}","{\"state\":{\"x\":1,\"x\":2}}","[]","null","","{"})
+   Reject(()=>JevDecisionGuard.Parse(raw));
+  if((int)JevDecisionGuard.Parse("{\"x\":1}")["x"]!=1)throw new Exception("Valid JSON rejected");checks++;
   Console.WriteLine("{\"passed\":true,\"productionGuardCompiled\":true,\"checks\":"+checks+",\"unityEditorValidated\":false,\"liveCalls\":0}");
  }
 }

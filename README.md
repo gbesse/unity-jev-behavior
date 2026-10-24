@@ -98,3 +98,11 @@ FR — Le garde refuse les politiques vides, les issues blanches et les doublons
 EN — The guard rejects empty policies, blank outcomes and duplicates before accepting any verdict. This change is source-only; Editor tests and player build remain unvalidated (previous attempt lacked a valid license, exit 198).
 
 ES — El guard rechaza políticas vacías, resultados en blanco y duplicados antes de aceptar un veredicto. Cambio publicado solo en fuente; pruebas Editor y player build sin validar (intento previo sin licencia válida, código 198).
+
+## Strict JSON / JSON strict / JSON estricto
+
+FR — Les objets JSON d’état et de réponse passent par un parseur commun qui refuse les clés dupliquées, même imbriquées. Les erreurs ne recopient pas le corps. Tests du garde réel uniquement ; Editor/Behavior/UnityWebRequest/player restent non validés.
+
+EN — State and response JSON objects use a shared parser rejecting duplicate keys, including nested keys. Errors do not echo the body. Actual guard tests only; Editor/Behavior/UnityWebRequest/player remain unvalidated.
+
+ES — Los objetos JSON de estado y respuesta usan un analizador común que rechaza claves duplicadas, incluso anidadas. Los errores no repiten el cuerpo. Solo pruebas del guard real; Editor/Behavior/UnityWebRequest/player siguen sin validar.

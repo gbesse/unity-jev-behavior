@@ -7,6 +7,15 @@ namespace JevBehavior
 {
     public static class JevDecisionGuard
     {
+        public static JObject Parse(string raw)
+        {
+            try {
+                if (string.IsNullOrWhiteSpace(raw)) throw new JsonException();
+                return JObject.Parse(raw, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
+            } catch (JsonException) {
+                throw new InvalidOperationException("Objet JSON ambigu ou invalide / Ambiguous or invalid JSON object / Objeto JSON ambiguo o no válido");
+            }
+        }
         private static bool Text(JToken value) => value != null && value.Type == JTokenType.String && !string.IsNullOrWhiteSpace((string)value);
         private static bool Exact(JToken value, string expected) => Text(value) && string.Equals((string)value, expected, StringComparison.Ordinal);
         private static bool SchemaOne(JToken value) => value != null &&
