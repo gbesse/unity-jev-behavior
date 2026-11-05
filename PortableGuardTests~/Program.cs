@@ -25,6 +25,9 @@ class Program
   foreach(var raw in new[]{"{\"requestId\":\"a\",\"requestId\":\"b\"}","{\"record\":{\"outcome\":\"a\",\"outcome\":\"b\"}}","{\"state\":{\"x\":1,\"x\":2}}","[]","null","","{"})
    Reject(()=>JevDecisionGuard.Parse(raw));
   if((int)JevDecisionGuard.Parse("{\"x\":1}")["x"]!=1)throw new Exception("Valid JSON rejected");checks++;
+  Reject(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v1","support/triage",new[]{"billing"},"other-model"));
+  Reject(()=>JevDecisionGuard.Accept(Response(),"r1","v1","v1","support/triage",new[]{"billing"},""));
+  if(JevDecisionGuard.Accept(Response(),"r1","v1","v1","support/triage",new[]{"billing"},"jev-1.13.0")!="billing")throw new Exception("Pinned model rejected");checks++;
   Console.WriteLine("{\"passed\":true,\"productionGuardCompiled\":true,\"checks\":"+checks+",\"unityEditorValidated\":false,\"liveCalls\":0}");
  }
 }
