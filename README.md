@@ -106,3 +106,12 @@ FR — Les objets JSON d’état et de réponse passent par un parseur commun qu
 EN — State and response JSON objects use a shared parser rejecting duplicate keys, including nested keys. Errors do not echo the body. Actual guard tests only; Editor/Behavior/UnityWebRequest/player remain unvalidated.
 
 ES — Los objetos JSON de estado y respuesta usan un analizador común que rechaza claves duplicadas, incluso anidadas. Los errores no repiten el cuerpo. Solo pruebas del guard real; Editor/Behavior/UnityWebRequest/player siguen sin validar.
+
+
+## 2026-11-05 — FR / EN / ES
+
+FR : `JevBehaviorPolicy.ExpectedModel` est capturé au démarrage et comparé exactement au modèle du reçu avant mise à jour du blackboard. Valeur initiale `jev-1.13.0`. Garde de production C# et passerelle testés ; Unity Editor/Behavior/UnityWebRequest/player toujours NON validés (ancien refus de licence198). Source uniquement, aucun nouveau tag natif.
+
+EN: `JevBehaviorPolicy.ExpectedModel` is captured at start and exactly compared with receipt model before blackboard update. Default `jev-1.13.0`. Production C# guard and gateway tested; Unity Editor/Behavior/UnityWebRequest/player remain UNVALIDATED (historical license rejection198). Source only, no new native tag.
+
+ES: `JevBehaviorPolicy.ExpectedModel` se captura al inicio y compara exactamente con modelo del recibo antes de actualizar blackboard. Inicial `jev-1.13.0`. Garde C# de producción y pasarela probados; Unity Editor/Behavior/UnityWebRequest/player siguen NO validados (rechazo de licencia198 previo). Solo fuentes, sin tag nativo nuevo.

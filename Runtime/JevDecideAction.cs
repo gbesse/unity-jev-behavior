@@ -20,7 +20,7 @@ namespace JevBehavior
         [SerializeReference] public BlackboardVariable<string> Error = new();
         private CancellationTokenSource cancellation;
         private Task<JObject> pending;
-        private string requestId, revision, packId;
+        private string requestId, revision, packId, expectedModel;
         private string[] allowedOutcomes;
         protected override Status OnStart()
         {
@@ -30,7 +30,7 @@ namespace JevBehavior
                 var client = ClientObject.Value ? ClientObject.Value.GetComponent<JevDecisionClient>() : null;
                 if (!client || !Policy.Value) throw new InvalidOperationException("Assign a client GameObject and Jev policy.");
                 requestId = Guid.NewGuid().ToString("N"); revision = Revision.Value ?? "";
-                packId = Policy.Value.PackId; allowedOutcomes = (string[])Policy.Value.AllowedOutcomes.Clone();
+                packId = Policy.Value.PackId; expectedModel = Policy.Value.ExpectedModel; allowedOutcomes = (string[])Policy.Value.AllowedOutcomes.Clone();
                 cancellation = new CancellationTokenSource();
                 pending = client.EvaluateAsync(packId, StateJson.Value, revision, requestId, cancellation.Token);
                 return Status.Running;
@@ -43,7 +43,7 @@ namespace JevBehavior
             if (!pending.IsCompleted) return Status.Running;
             try
             {
-                Outcome.Value = JevDecisionGuard.Accept(pending.GetAwaiter().GetResult(), requestId, revision, Revision.Value ?? "", packId, allowedOutcomes);
+                Outcome.Value = JevDecisionGuard.Accept(pending.GetAwaiter().GetResult(), requestId, revision, Revision.Value ?? "", packId, allowedOutcomes, expectedModel);
                 return Status.Success;
             }
             catch (Exception exception) { return Fail(exception); }

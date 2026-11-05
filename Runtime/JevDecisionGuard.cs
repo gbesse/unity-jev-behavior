@@ -21,7 +21,7 @@ namespace JevBehavior
         private static bool SchemaOne(JToken value) => value != null &&
             ((value.Type == JTokenType.Integer && value.ToString(Formatting.None) == "1") ||
              (value.Type == JTokenType.Float && (double)value == 1.0));
-        public static string Accept(JObject response, string requestId, string capturedRevision, string currentRevision, string packId, string[] allowedOutcomes)
+        public static string Accept(JObject response, string requestId, string capturedRevision, string currentRevision, string packId, string[] allowedOutcomes, string expectedModel = null)
         {
             if (response == null || string.IsNullOrWhiteSpace(requestId) || string.IsNullOrWhiteSpace(capturedRevision) || string.IsNullOrWhiteSpace(currentRevision) || string.IsNullOrWhiteSpace(packId))
                 throw new InvalidOperationException("Identite de decision vide / Empty decision identity / Identidad de decision vacia");
@@ -38,6 +38,8 @@ namespace JevBehavior
             var pack = record?["pack"] as JObject;
             if (record == null || !SchemaOne(record["schemaVersion"]) || !Exact(pack?["name"], packId) || !Text(record["model"]))
                 throw new InvalidOperationException("Provenance de decision invalide / Invalid decision provenance / Procedencia de decision no valida");
+            if (expectedModel != null && !Exact(record["model"], expectedModel))
+                throw new InvalidOperationException("Modele different / Model mismatch / Modelo distinto");
             var value = record["outcome"];
             if (!Text(value) || allowedOutcomes == null || Array.IndexOf(allowedOutcomes, (string)value) < 0)
                 throw new InvalidOperationException("Issue de decision non autorisee / Decision outcome not allowed / Resultado de decision no permitido");
